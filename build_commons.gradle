@@ -49,6 +49,21 @@ tasks.eclipse.doLast {
     }
     formatter.append('\n#End - Add by gradle build')
 
+    // read default save actions
+    def words = []
+    new File("${projectDir}/../org.eclipse.jdt.ui.prefs").eachLine { line ->
+        words << line
+    }
+
+    // set save actions in project
+    File actions = new File("${projectDir}/.settings/org.eclipse.jdt.ui.prefs")
+    actions.append('\n#Add by gradle build')
+    words.each {
+        actions.append('\n')
+        actions.append(it)
+    }
+    actions.append('\n#End - Add by gradle build')
+
     // copy buildship file
     copy {
         from "../org.eclipse.buildship.core.prefs"
