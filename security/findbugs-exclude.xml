@@ -1,0 +1,14 @@
+<FindBugsFilter>
+    
+    <Match>
+        <Bug category="EXPERIMENTAL" />
+    </Match>
+    <Match>
+        <Class name="~.*Test$" />
+    </Match>
+    <Match>
+        <Package name="~test\..*" />
+    </Match>
+
+</FindBugsFilter>
+

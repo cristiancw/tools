@@ -1,0 +1,85 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "findbugs"
+apply plugin: "checkstyle"
+apply plugin: "jacoco"
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.+'
+    
+    testCompile 'junit:junit:4.+'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "4.6"
+}
+
+eclipse {
+    pathVariables 'GRADLE_HOME': gradle.gradleHomeDir
+    project {
+        natures 'org.eclipse.jdt.core.javanature'
+        natures 'org.eclipse.buildship.core.gradleprojectnature'
+        
+        buildCommand 'org.eclipse.jdt.core.javabuilder'
+        buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
+    }
+}
+
+tasks.eclipse.doLast {
+    // read default formatter
+    def words = []
+    new File("${projectDir}/../org.eclipse.jdt.core.prefs").eachLine { line ->
+        words << line
+    }
+
+    // set formatter in project
+    File formatter = new File("${projectDir}/.settings/org.eclipse.jdt.core.prefs")
+    formatter.append('\n#Add by gradle build')
+    words.each {
+        formatter.append('\n')
+        formatter.append(it)
+    }
+    formatter.append('\n#End - Add by gradle build')
+
+    // copy buildship file
+    copy {
+        from "../org.eclipse.buildship.core.prefs"
+        into ".settings/"
+    }
+}
+
+
+findbugs {
+    sourceSets = [sourceSets.main]
+    effort = "max"
+    reportLevel = "medium"
+    String excludeFile = "${projectDir}/findbugs-exclude.xml"
+    if (new File(excludeFile).exists()) {
+        excludeFilter = file(excludeFile)
+    }
+}
+
+checkstyle {
+    sourceSets = [sourceSets.main]
+    ignoreFailures = true
+    if(new File('checkstyle-config.xml').exists()) {
+        configFile = rootProject.file('checkstyle-config.xml')
+    } else {
+        configFile = rootProject.file('../checkstyle-config.xml')
+    }
+    if(new File('checkstyle-exclude.xml').exists()) {
+        configProperties = [basedir: "${projectDir}"]
+    } else if(new File("${projectDir}/checkstyle-exclude.xml").exists()) {
+        configProperties = [basedir: "${projectDir}/"]
+    }
+}
+
+tasks.eclipse.dependsOn(cleanEclipse)

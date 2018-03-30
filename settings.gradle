@@ -1,0 +1,18 @@
+rootProject.name = 'tools'
+
+def subDirs = rootDir.listFiles(new FileFilter() {
+    public boolean accept(File file) {
+        def exclude = file.name in [
+            'ignore'
+        ]
+        return file.isDirectory() && !exclude
+    }
+});
+
+subDirs.each { File dir ->
+    if(new File(dir, 'build.gradle').isFile()){
+        String sInclude = ':'+ dir.name;
+        include sInclude;
+        project(sInclude).projectDir = dir
+    }
+}
