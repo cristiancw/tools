@@ -50,7 +50,7 @@ tasks.eclipse.doLast {
     formatter.append('\n#End - Add by gradle build')
 
     // read default save actions
-    def words = []
+    words = []
     new File("${projectDir}/../org.eclipse.jdt.ui.prefs").eachLine { line ->
         words << line
     }
