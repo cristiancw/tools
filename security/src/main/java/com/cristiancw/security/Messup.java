@@ -40,6 +40,10 @@ final class Messup {
 
 	private static final String MSG_PARAM_IS_EMPTY = "The secret String is empty";
 
+	private Messup() {
+		// Can instance
+	}
+
 	static boolean isMessupString(final String secret) {
 		if (secret == null || secret.trim().isEmpty()) {
 			return false;
@@ -59,7 +63,7 @@ final class Messup {
 			final SecretKeySpec skeySpec = createKey(userSalt);
 
 			final Cipher cipher = getCipher(Cipher.ENCRYPT_MODE, ivParam, skeySpec);
-			final byte[] messed = cipher.doFinal(secret.getBytes());
+			final byte[] messed = cipher.doFinal(secret.getBytes(StandardCharsets.UTF_8));
 
 			final byte[] secretBytes = join(ivBytes, messed);
 
@@ -85,7 +89,7 @@ final class Messup {
 			final Cipher cipher = getCipher(Cipher.DECRYPT_MODE, ivParam, skeySpec);
 			final byte[] original = cipher.doFinal(encrypted);
 
-			return new String(original);
+			return byteToString(original);
 		} catch (IllegalBlockSizeException | BadPaddingException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | NoSuchPaddingException | InvalidAlgorithmParameterException e) {
 			throw new MessupException(e);
 		}

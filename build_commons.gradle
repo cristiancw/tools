@@ -71,7 +71,6 @@ tasks.eclipse.doLast {
     }
 }
 
-
 findbugs {
     sourceSets = [sourceSets.main]
     effort = "max"
